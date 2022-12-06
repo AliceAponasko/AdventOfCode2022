@@ -41,14 +41,6 @@ private extension String {
         fatalError("Welp.")
     }
 
-    subscript(to end: Int) -> String {
-        String(self[..<index(startIndex, offsetBy: end)])
-    }
-
-    subscript(from start: Int) -> String {
-        String(self[index(startIndex, offsetBy: start)...])
-    }
-
     func toSet() -> Set<String> {
         reduce(into: Set<String>()) { $0.insert(String($1)) }
     }
