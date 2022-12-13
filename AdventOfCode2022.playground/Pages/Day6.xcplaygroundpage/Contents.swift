@@ -2,7 +2,7 @@ import Foundation
 
 extension Day6 {
 
-    static func decodeMessage(size: Int = 4) -> Int {
+    static func decodeMessage(size: Int) -> Int {
         var queue = Queue(maxSize: size)
 
         for iterator in Day6.data.enumerated() {
@@ -17,5 +17,5 @@ extension Day6 {
 
 }
 
-print(Day6.decodeMessage())
+print(Day6.decodeMessage(size: 4))
 print(Day6.decodeMessage(size: 14))
