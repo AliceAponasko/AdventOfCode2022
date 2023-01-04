@@ -10,7 +10,7 @@ extension Day11 {
 
     class Monkey: Equatable, Hashable {
         var id: Int!
-        var items: [UInt64]!
+        var items: [Int]!
         var operation: Operation!
         var test: Int!
         var trueMonkeyID: Int!
@@ -18,10 +18,10 @@ extension Day11 {
 
         init() {}
 
-        func newWorryLevel(_ item: UInt64) -> UInt64 {
+        func newWorryLevel(_ item: Int) -> Int {
             switch operation {
-            case let .plus(value): return item + UInt64(value)
-            case let .multiply(value): return item * UInt64(value)
+            case let .plus(value): return item + value
+            case let .multiply(value): return item * value
             case .multiplySelf: return item * item
             default: fatalError("Unknown operation.")
             }
@@ -48,8 +48,8 @@ extension Day11 {
             for key in 0..<monkeys.count {
                 let monkey = monkeys[key]!
                 for item in monkey.items {
-                    let worryLevel = monkey.newWorryLevel(item) / UInt64(relief)
-                    if worryLevel % UInt64(monkey.test) == 0 {
+                    let worryLevel = monkey.newWorryLevel(item) / relief
+                    if worryLevel % monkey.test == 0 {
                         monkeys[monkey.trueMonkeyID]!.items.append(worryLevel)
                     } else {
                         monkeys[monkey.falseMonkeyID]!.items.append(worryLevel)
@@ -81,7 +81,7 @@ extension Day11 {
                         with: ""
                     )
                     stringItems = stringItems.replacingOccurrences(of: " ", with: "")
-                    monkey.items = stringItems.components(separatedBy: ",").map { UInt64($0)! }
+                    monkey.items = stringItems.components(separatedBy: ",").map { Int($0)! }
 
                 case 2:
                     var stringOperation = lines[i].replacingOccurrences(
