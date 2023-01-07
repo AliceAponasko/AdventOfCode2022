@@ -3,8 +3,8 @@ import Foundation
 extension Day11 {
 
     enum Operation: Equatable, Hashable {
-        case plus(value: Int)
-        case multiply(value: Int)
+        case plus(Int)
+        case multiply(Int)
         case multiplySelf
     }
 
@@ -90,10 +90,10 @@ extension Day11 {
                     )
                     let operationComponents = stringOperation.components(separatedBy: .whitespaces)
                     if operationComponents.first! == "+" {
-                        monkey.operation = .plus(value: Int(operationComponents.last!)!)
+                        monkey.operation = .plus(Int(operationComponents.last!)!)
                     } else {
                         if let multiplyValue = Int(operationComponents.last!) {
-                            monkey.operation = .multiply(value: multiplyValue)
+                            monkey.operation = .multiply(multiplyValue)
                         } else {
                             monkey.operation = .multiplySelf
                         }

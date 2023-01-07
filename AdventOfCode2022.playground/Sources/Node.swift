@@ -12,7 +12,6 @@ public class Node: Hashable, Equatable {
     public var value: Int
 
     public var debugDescription: String { "\(type) \(name) \(value) \(nodes.map { $0.debugDescription })" }
-    public var hashValue: Int { name.hashValue }
 
     public init(
         name: String,
@@ -26,8 +25,16 @@ public class Node: Hashable, Equatable {
         self.value = value
     }
 
+    // MARK: - Equatable
+
     public static func ==(lhs: Node, rhs: Node) -> Bool {
         lhs.name == rhs.name
+    }
+
+    // MARK: - Hashable
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(name)
     }
 
 }
