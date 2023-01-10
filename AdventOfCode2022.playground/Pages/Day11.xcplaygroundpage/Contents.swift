@@ -67,7 +67,7 @@ extension Day11 {
     private static func parseData(_ data: String) -> [Int: Monkey] {
         data.components(separatedBy: "\n\n").map { paragraph in
             let lines = paragraph.components(separatedBy: .newlines)
-            var monkey = Monkey()
+            let monkey = Monkey()
 
             for i in 0..<lines.count {
                 switch i {
@@ -84,7 +84,7 @@ extension Day11 {
                     monkey.items = stringItems.components(separatedBy: ",").map { Int($0)! }
 
                 case 2:
-                    var stringOperation = lines[i].replacingOccurrences(
+                    let stringOperation = lines[i].replacingOccurrences(
                         of: "  Operation: new = old ",
                         with: ""
                     )
@@ -100,21 +100,21 @@ extension Day11 {
                     }
 
                 case 3:
-                    var stringTest = lines[i].replacingOccurrences(
+                    let stringTest = lines[i].replacingOccurrences(
                         of: "  Test: divisible by ",
                         with: ""
                     )
                     monkey.test = Int(String(stringTest))!
 
                 case 4:
-                    var stringTestTrue = lines[i].replacingOccurrences(
+                    let stringTestTrue = lines[i].replacingOccurrences(
                         of: "    If true: throw to monkey ",
                         with: ""
                     )
                     monkey.trueMonkeyID = Int(String(stringTestTrue.first!))!
 
                 case 5:
-                    var stringTestFalse = lines[i].replacingOccurrences(
+                    let stringTestFalse = lines[i].replacingOccurrences(
                         of: "    If false: throw to monkey ",
                         with: ""
                     )

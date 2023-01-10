@@ -1,22 +1,22 @@
 import Foundation
 
-public enum NodeType: Hashable {
+public enum TreeNodeType: Hashable {
     case file
     case dir
 }
 
-public class Node: Hashable, Equatable {
+public class TreeNode: Hashable, Equatable {
     public var name: String
-    public var nodes: Set<Node>
-    public var type: NodeType
+    public var nodes: Set<TreeNode>
+    public var type: TreeNodeType
     public var value: Int
 
     public var debugDescription: String { "\(type) \(name) \(value) \(nodes.map { $0.debugDescription })" }
 
     public init(
         name: String,
-        nodes: Set<Node> = Set<Node>(),
-        type: NodeType,
+        nodes: Set<TreeNode> = Set<TreeNode>(),
+        type: TreeNodeType,
         value: Int = 0
     ) {
         self.name = name
@@ -27,7 +27,7 @@ public class Node: Hashable, Equatable {
 
     // MARK: - Equatable
 
-    public static func ==(lhs: Node, rhs: Node) -> Bool {
+    public static func ==(lhs: TreeNode, rhs: TreeNode) -> Bool {
         lhs.name == rhs.name
     }
 

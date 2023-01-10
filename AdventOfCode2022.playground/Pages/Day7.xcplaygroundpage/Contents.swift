@@ -10,18 +10,18 @@ extension Day7 {
     }
 
     static func part1() -> Int {
-        let root = Node(name: "/", type: .dir)
+        let root = TreeNode(name: "/", type: .dir)
         parseTree(Array(Day7.data.components(separatedBy: .newlines).dropFirst()), root)
         return sumAtMost100000(root)
     }
 
     static func part2() -> Int {
-        let root = Node(name: "/", type: .dir)
+        let root = TreeNode(name: "/", type: .dir)
         parseTree(Array(Day7.data.components(separatedBy: .newlines).dropFirst()), root)
         return freeUpSpace(root, 30000000 - (70000000 - root.value), root.value)
     }
 
-    private static func parseTree(_ c: [String], _ node: Node) -> ([String], Node) {
+    private static func parseTree(_ c: [String], _ node: TreeNode) -> ([String], TreeNode) {
         var currentNode = node
         var commands = c
 
@@ -33,7 +33,7 @@ extension Day7 {
                 continue
             } else if command.starts(with: "dir ") {
                 currentNode.nodes.insert(
-                    Node(
+                    TreeNode(
                         name: command.components(separatedBy: .whitespaces).last!,
                         type: .dir,
                         value: 0
@@ -42,7 +42,7 @@ extension Day7 {
             } else if let intRange = command.rangeOfCharacter(from: CharacterSet.decimalDigits),
                       intRange.lowerBound != intRange.upperBound,
                       intRange.lowerBound == command.startIndex {
-                let newNode = Node(
+                let newNode = TreeNode(
                     name: command.components(separatedBy: .whitespaces).last!,
                     type: .file,
                     value: Int(command.components(separatedBy: .whitespaces).first!)!
@@ -69,7 +69,7 @@ extension Day7 {
         return ([], currentNode)
     }
 
-    private static func sumAtMost100000(_ node: Node) -> Int {
+    private static func sumAtMost100000(_ node: TreeNode) -> Int {
         var result = 0
         switch node.type {
         case .file:
@@ -83,13 +83,19 @@ extension Day7 {
         return result
     }
 
-    private static func freeUpSpace(_ node: Node, _ neededSpace: Int, _ currentMin: Int) -> Int {
+    private static func freeUpSpace(
+        _ node: TreeNode,
+        _ neededSpace: Int,
+        _ currentMin: Int
+    ) -> Int {
         var result = currentMin
         switch node.type {
         case .file:
             return currentMin
         case .dir:
-            result = (node.value > neededSpace && node.value < currentMin) ? node.value : currentMin
+            result = (node.value > neededSpace && node.value < currentMin)
+                ? node.value
+                : currentMin
             for currentNode in node.nodes {
                 result = min(result, freeUpSpace(currentNode, neededSpace, currentMin))
             }
