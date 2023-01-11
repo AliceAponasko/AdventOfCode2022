@@ -78,9 +78,13 @@ extension Day12 {
                 }
 
                 for edge in neighbors {
-                    if !visited.contains(edge.destination) {
-                        visited.insert(edge.destination)
-                        if edge.weight <= 1 {
+                    if edge.source.value == "z", edge.destination.value == "E" {
+                        return potentialPath
+                    }
+
+                    if edge.weight >= 0, edge.weight <= 1 {
+                        if !visited.contains(edge.destination) {
+                            visited.insert(edge.destination)
                             potentialPath.append(edge.destination)
                             continue outer
                         }
@@ -123,7 +127,7 @@ abdefghi
         return graph.depthFirstSearch(
             from: Vertex(coordinate: Coordinate(x: startX, y: startY), value: "S"),
             to: Vertex(coordinate: Coordinate(x: endX, y: endY), value: "E")
-        ).count
+        ).count + 2 // S and E
     }
 
     private static func makeEdges(for vertex: Vertex, grid: [[Character]]) -> [Edge] {
@@ -131,9 +135,9 @@ abdefghi
 
         for (x, y) in [(-1, 0), (0, 1), (1, 0), (0, -1)] {
             guard
-                vertex.coordinate.x + x < grid.first!.count,
+                vertex.coordinate.x + x < grid.count,
                 vertex.coordinate.x + x >= 0,
-                vertex.coordinate.y + y < grid.count,
+                vertex.coordinate.y + y < grid.first!.count,
                 vertex.coordinate.y + y >= 0
             else { continue }
 
@@ -156,8 +160,17 @@ abdefghi
 
     private static func weight(_ source: Vertex, _ destination: Vertex) -> Int {
         let alphabet = Array("abcdefghijklmnopqrstuvwxyz")
-        if let sourceIndex = alphabet.firstIndex(of: source.value),
-           let destinationIndex = alphabet.firstIndex(of: destination.value) {
+
+        var sourceValue = source.value
+        if source.value == "S" { sourceValue = "a" }
+        else if source.value == "E" { sourceValue == "z" }
+
+        var destinationValue = destination.value
+        if destination.value == "S" { destinationValue = "a" }
+        else if destination.value == "E" { destinationValue == "z" }
+
+        if let sourceIndex = alphabet.firstIndex(of: sourceValue),
+           let destinationIndex = alphabet.firstIndex(of: destinationValue) {
             return destinationIndex - sourceIndex
         }
 
