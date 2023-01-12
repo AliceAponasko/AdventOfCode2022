@@ -6,6 +6,7 @@ public enum TreeNodeType: Hashable {
 }
 
 public class TreeNode: Hashable, Equatable {
+    
     public var name: String
     public var nodes: Set<TreeNode>
     public var type: TreeNodeType

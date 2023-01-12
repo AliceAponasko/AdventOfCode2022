@@ -30,5 +30,5 @@ public class Stack {
         items.removeLast(k)
         return Array(result)
     }
-}
 
+}

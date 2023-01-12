@@ -2,115 +2,20 @@ import Foundation
 
 extension Day12 {
 
-    struct Coordinate: Hashable {
-        let line: Int
-        let column: Int
-    }
-
-    struct Vertex: Equatable, Hashable {
-        var coordinate: Coordinate
-        var value: Character
-    }
-
-    struct Edge: Equatable, Hashable {
-        var source: Vertex
-        var destination: Vertex
-        let weight: Int
-    }
-
-    enum Visit {
-        case source
-        case edge(Edge)
-    }
-
-    class Graph {
-        private var map = [Vertex: [Edge]]()
-
-        init() {}
-
-        func createVertex(_ coordinate: Coordinate, _ value: Character) -> Vertex {
-            let vertex = Vertex(coordinate: coordinate, value: value)
-
-            if !map.keys.contains(vertex) {
-                map[vertex] = []
-            }
-
-            return vertex
-        }
-
-        func addEdge(from source: Vertex, to destination: Vertex, weight: Int) {
-            let edge = Edge(source: source, destination: destination, weight: weight)
-
-            if !map.keys.contains(source) {
-                map[source] = []
-            }
-
-            map[source]?.append(edge)
-        }
-
-        func addEdges(_ edges: [Edge], for source: Vertex) {
-            map[source] = edges
-        }
-
-        func edges(for source: Vertex) -> [Edge]? {
-            map[source]
-        }
-
-        func weight(from source: Vertex, to destination: Vertex) -> Int? {
-            guard let edges = map[source] else { return nil }
-
-            for edge in edges {
-                if edge.destination == destination {
-                    return edge.weight
-                }
-            }
-
-            return nil
-        }
-
-        func breadthFirstSearch(from source: Vertex, to destination: Vertex) -> [Edge]? {
-            var queueArray = [Vertex]()
-            queueArray.append(source)
-
-            var visits = [source: Visit.source]
-
-            while queueArray.count != 0 {
-                let visitedVertex = queueArray.removeFirst()
-
-                if visitedVertex == destination {
-                    var vertex = destination
-                    var route = [Edge]()
-
-                    while let visit = visits[vertex],
-                        case let .edge(edge) = visit {
-                            route = [edge] + route
-                            vertex = edge.source
-
-                    }
-
-                    return route
-                }
-
-                for edge in edges(for: visitedVertex)! {
-                    if visits[edge.destination] == nil {
-                        queueArray.append(edge.destination)
-                        visits[edge.destination] = .edge(edge)
-                    }
-                }
-            }
-
-            return nil
-        }
-    }
-
     static func fewestStepsToSignal() -> Int {
         let grid = Day12.data.components(separatedBy: .newlines).map { Array($0) }
         let graph = Graph()
 
         for i in 0..<grid.count {
             for j in 0..<grid[i].count {
-                let source = graph.createVertex(Coordinate(line: i, column: j), grid[i][j])
-                graph.addEdges(makeEdges(for: source, grid: grid), for: source)
+                let source = graph.createVertex(
+                    Graph.Coordinate(line: i, column: j),
+                    grid[i][j]
+                )
+                graph.addEdges(
+                    makeEdges(for: source, grid: grid),
+                    for: source
+                )
             }
         }
 
@@ -121,13 +26,19 @@ extension Day12 {
         let endColumn = grid[endLine].firstIndex(where: { $0 == "E" })!
 
         return graph.breadthFirstSearch(
-            from: Vertex(coordinate: Coordinate(line: startLine, column: startColumn), value: "S"),
-            to: Vertex(coordinate: Coordinate(line: endLine, column: endColumn), value: "E")
-        )?.count ?? 0
+            from: Graph.Vertex(
+                coordinate: Graph.Coordinate(line: startLine, column: startColumn),
+                value: "S"
+            ),
+            to: Graph.Vertex(
+                coordinate: Graph.Coordinate(line: endLine, column: endColumn),
+                value: "E"
+            )
+        ).count
     }
 
-    private static func makeEdges(for vertex: Vertex, grid: [[Character]]) -> [Edge] {
-        var result = [Edge]()
+    private static func makeEdges(for vertex: Graph.Vertex, grid: [[Character]]) -> [Graph.Edge] {
+        var result = [Graph.Edge]()
 
         for (x, y) in [(-1, 0), (0, 1), (1, 0), (0, -1)] {
             guard
@@ -140,8 +51,8 @@ extension Day12 {
             }
 
             let source = vertex
-            let destination = Vertex(
-                coordinate: Coordinate(
+            let destination = Graph.Vertex(
+                coordinate: Graph.Coordinate(
                     line: vertex.coordinate.line + x,
                     column: vertex.coordinate.column + y
                 ),
@@ -151,7 +62,7 @@ extension Day12 {
             let weight = weight(source, destination)
             if weight <= 1 {
                 result.append(
-                    Edge(source: source, destination: destination, weight: weight)
+                    Graph.Edge(source: source, destination: destination, weight: weight)
                 )
             }
         }
@@ -159,7 +70,7 @@ extension Day12 {
         return result
     }
 
-    private static func weight(_ source: Vertex, _ destination: Vertex) -> Int {
+    private static func weight(_ source: Graph.Vertex, _ destination: Graph.Vertex) -> Int {
         let alphabet = Array("abcdefghijklmnopqrstuvwxyz")
 
         if let sourceIndex = alphabet.firstIndex(of: source.value),
