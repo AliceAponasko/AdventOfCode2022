@@ -35,33 +35,58 @@ extension Day14 {
             case flowingIntoTheAbyss
         }
 
-        let value: Set<Coordinate>
-        private let maxRow: Int
+        let lowestRow: Int
+        var value: Set<Coordinate>
+        let withFloor: Bool
 
-        init(value: Set<Coordinate>) {
+        init(value: Set<Coordinate>, withFloor: Bool, lowestRow: Int? = nil) {
             self.value = value
-            self.maxRow = value.map { $0.row }.max()!
+            if let lowestRow {
+                self.lowestRow = lowestRow
+            } else {
+                self.lowestRow = value.map { $0.row }.max()! + (withFloor ? 2 : 0)
+            }
+            self.withFloor = withFloor
         }
 
         func availableDirection(for coordinate: Coordinate) -> AvailableDirection {
-            if coordinate.row > maxRow { return .flowingIntoTheAbyss }
+            if withFloor {
+                if value.contains(coordinate.oneStepDown),
+                   value.contains(coordinate.oneStepDownAndLeft),
+                    value.contains(coordinate.oneStepDownAndRight) {
+                    return .none
+                }
+                if coordinate.oneStepDown.row == lowestRow {
+                    value = value.union(
+                        [
+                            coordinate.oneStepDown,
+                            coordinate.oneStepDownAndLeft,
+                            coordinate.oneStepDownAndRight,
+                        ]
+                    )
+                }
+            } else {
+                if coordinate.row > lowestRow { return .flowingIntoTheAbyss }
+            }
+
             if !value.contains(coordinate.oneStepDown) { return .down }
             if !value.contains(coordinate.oneStepDownAndLeft) { return .left }
             if !value.contains(coordinate.oneStepDownAndRight) { return .right }
+
             return .none
         }
 
         func copy(with coordinate: Coordinate) -> Grid {
-            Grid(value: value.union([coordinate]))
+            Grid(value: value.union([coordinate]), withFloor: withFloor, lowestRow: lowestRow)
         }
     }
 
     enum LandingResult {
         case landed
-        case flowingIntoTheAbyss
+        case done
     }
 
-    static func countRestingSand() -> Int {
+    static func countRestingSand(withFloor: Bool = false) -> Int {
         var grid = Grid(
             value: Day14.data
                 .components(separatedBy: .newlines).map { line in
@@ -84,7 +109,8 @@ extension Day14 {
 
                     return Array(result)
                 }
-                .reduce(Set<Coordinate>()) { $0.union($1) }
+                .reduce(Set<Coordinate>()) { $0.union($1) },
+            withFloor: withFloor
         )
 
         var restingSand = -1
@@ -92,25 +118,39 @@ extension Day14 {
 
         repeat {
             restingSand += 1
-            (landingResult, grid) = landSand(in: grid)
-        } while landingResult != .flowingIntoTheAbyss
+            (landingResult, grid) = landSand(
+                until: withFloor ? Coordinate(column: 500, row: 0) : nil,
+                in: grid
+            )
+        } while landingResult != .done
 
         return restingSand
     }
 
     private static func landSand(
         from startPoint: Coordinate = Coordinate(column: 500, row: 0),
+        until endPoint: Coordinate?,
         in grid: Grid
     ) -> (LandingResult, Grid) {
+        if let endPoint {
+            guard !grid.value.contains(endPoint) else { return (.done, grid) }
+        }
+
         switch grid.availableDirection(for: startPoint) {
-        case .down: return landSand(from: startPoint.oneStepDown, in: grid)
-        case .left: return landSand(from: startPoint.oneStepDownAndLeft, in: grid)
-        case .right: return landSand(from: startPoint.oneStepDownAndRight, in: grid)
-        case .none: return (.landed, grid.copy(with: startPoint))
-        case .flowingIntoTheAbyss: return (.flowingIntoTheAbyss, grid)
+        case .down:
+            return landSand(from: startPoint.oneStepDown, until: endPoint, in: grid)
+        case .left:
+            return landSand(from: startPoint.oneStepDownAndLeft, until: endPoint, in: grid)
+        case .right:
+            return landSand(from: startPoint.oneStepDownAndRight, until: endPoint, in: grid)
+        case .none:
+            return (.landed, grid.copy(with: startPoint))
+        case .flowingIntoTheAbyss:
+            return (.done, grid)
         }
     }
 
 }
 
 print(Day14.countRestingSand())
+print(Day14.countRestingSand(withFloor: true))
