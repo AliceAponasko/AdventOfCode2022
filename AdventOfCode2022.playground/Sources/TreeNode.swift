@@ -12,7 +12,9 @@ public class TreeNode: Hashable, Equatable {
     public var type: TreeNodeType
     public var value: Int
 
-    public var debugDescription: String { "\(type) \(name) \(value) \(nodes.map { $0.debugDescription })" }
+    public var debugDescription: String {
+        "\(type) \(name) \(value) \(nodes.map { $0.debugDescription })"
+    }
 
     public init(
         name: String,
